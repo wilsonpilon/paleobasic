@@ -6,7 +6,7 @@
 
 ![Editor com destaque de sintaxe para o dialeto Basic Dignified](docs/images/msxbasica-01.png)
 
-**Versão atual: 8.7.5** — versão e build (data/hora UTC de compilação, em
+**Versão atual: 8.8.0** — versão e build (data/hora UTC de compilação, em
 hexadecimal) são embutidas no executável pelo `build.ps1` e exibidas em `Ajuda → Sobre...`.
 
 IDE nativa em **PureBasic** para desenvolvimento em MSX BASIC (dialeto "Dignified", sem números de

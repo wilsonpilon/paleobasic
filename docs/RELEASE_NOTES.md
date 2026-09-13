@@ -6,6 +6,35 @@ Para o histórico completo e detalhado sessão a sessão (incluindo versões sem
 
 ---
 
+## 8.8.0 — "CAMADA K-PG" (2026-09-13)
+
+**Tema da versão**: extinção controlada. O Fossauro — o emulador MSX nativo em PureBasic (port do fMSX
+de Marat Fayzullin) que vivia como sub-projeto irmão dentro deste repositório desde 2026-08-15 — foi
+removido do projeto inteiro, a pedido explícito do usuário. O nome da versão é a referência óbvia pra
+quem conhece o tema pré-histórico do projeto: a **camada K-Pg** (limite Cretáceo-Paleogeno) é a marca
+geológica real que registra a extinção dos dinossauros, e o Fossauro — como quase todo módulo do
+projeto — carregava um nome de dinossauro.
+
+### Remoções
+
+- Diretório-fonte `src/fossauro/` inteiro (o port em PureBasic do fMSX), `dist/fossauro.exe`/
+  `dist/fossauro/`, `resource/fossauro_help/`, `docs/fossauro/`, `LICENSE-fossauro`.
+- O comando `FOSSAURO` do monitor do Mamute Assembler e toda a integração com a IDE — menus
+  `Executar/Configurar/Ajuda → Fossauro` e os passos de build que o compilavam em `build.ps1`/
+  `build.sh`/`build-installer.ps1`/instalador.
+- Seção "Fossauro" de `docs/MANUAL.md`. Os módulos 32b-32p e 32r-32z de `docs/SPEC.md` que
+  documentavam sua arquitetura e a integração com a IDE ficam marcados como removidos (histórico
+  preservado, não apagado).
+
+### Bastidores
+
+- Deve ser substituído no futuro por um projeto separado, ainda não incorporado a este repositório:
+  [**gofMSX**](https://github.com/wilsonpilon/gofMSX). Nada no código atual chama pra lá.
+- Nenhuma mudança de comportamento no resto da IDE — Basic Dignified, Mamute Assembler, gerenciador de
+  disco e a ponte com o openMSX de verdade (`OpenMSXBridge.pbi`) continuam exatamente como estavam.
+
+---
+
 ## 8.7.5 — "NOTA NA PORTA" (2026-08-26)
 
 **Tema da versão**: dois recursos novos e independentes chegam ao Mamute Assembler no mesmo dia — um
