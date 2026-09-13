@@ -262,19 +262,6 @@ if [ "$DISTRIBUTE" -eq 1 ]; then
     mkdir -p "$DIST_EDITOR_DIR/tools"
     copy_dist_item "$SCRIPT_DIR/resource/tools/msxbas2rom" "$DIST_EDITOR_DIR/tools/"
     copy_dist_item "$SCRIPT_DIR/resource/tools/n80" "$DIST_EDITOR_DIR/tools/"
-    mkdir -p "$DIST_DIR/fossauro"
-    copy_dist_item "$SCRIPT_DIR/resource/fossauro_help" "$DIST_DIR/fossauro/help"
-
-    # ROMs do sistema MSX pro Fossauro - mesma logica do build.ps1 (ver
-    # comentario la): dist/fossauro roda com CWD = dist/, entao a pasta de
-    # ROMs precisa se chamar dist/roms/, nao dist/fossauro/roms/. Fonte
-    # canonica em resource/roms/ - copyright proprio, nunca rastreado no git.
-    if [ -d "$SCRIPT_DIR/resource/roms" ]; then
-        mkdir -p "$DIST_DIR/roms"
-        for rom in "$SCRIPT_DIR"/resource/roms/*.ROM; do
-            [ -e "$rom" ] && copy_dist_item "$rom" "$DIST_DIR/roms/"
-        done
-    fi
 
     echo "dist/ atualizado em: $DIST_DIR"
 fi

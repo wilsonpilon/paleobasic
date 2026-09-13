@@ -2957,3 +2957,12 @@ hoje, veja o [`README.md`](README.md). Para arquitetura/decisões técnicas de c
     36 comandos com prefixo `X` ao todo nesta versão. Compilado limpo a cada bloco de mudança; sem
     verificação ao vivo das janelas novas nem de um programa real executando `OUT`/`IN` (mesmo bloqueio
     de teclado sintético neste ambiente de automação, já documentado no módulo 45h).
+- **2026-09-13** — Fossauro (o emulador MSX nativo em PureBasic, port do fMSX de Marat Fayzullin,
+  `src/fossauro/`) removido do projeto inteiro, a pedido explícito do usuário: diretório-fonte,
+  `dist/fossauro.exe`/`dist/fossauro/`, `resource/fossauro_help/`, `docs/fossauro/`,
+  `LICENSE-fossauro`, o comando `FOSSAURO` do monitor do Mamute Assembler, e toda a integração com a
+  IDE (menus `Executar/Configurar/Ajuda → Fossauro`, passos de build em `build.ps1`/`build.sh`/
+  `build-installer.ps1`/instalador) — ver `docs/SPEC.md` (módulos 32b-32p/32r-32z, marcados
+  removidos) e `CLAUDE.md` para o registro completo. Deve ser substituído no futuro por um projeto
+  separado, ainda não incorporado a este repositório (**gofMSX**,
+  https://github.com/wilsonpilon/gofMSX).

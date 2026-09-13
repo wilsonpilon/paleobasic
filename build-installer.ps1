@@ -5,7 +5,7 @@
 .DESCRIPTION
     Fluxo completo, nesta ordem:
       1. Roda .\build.ps1 (raiz do repo) pra garantir que dist\ esta fresco
-         (os dois executaveis + recursos) - o instalador embute uma copia de
+         (executavel + recursos) - o instalador embute uma copia de
          dist\, entao nunca deve empacotar um build velho.
       2. Gera um manifesto (lista de arquivos a empacotar) via
          "git ls-files dist/" - a mesma lista que o proprio git ja usa pra
@@ -17,11 +17,6 @@
          dist\editor\tools\msxbas2rom\games\) nao virem escapados em octal
          (\303\255) na saida - confirmado um caso real assim ao testar, o
          arquivo ficava de fora do pacote silenciosamente sem esse flag.
-         dist\fossauro.exe e dist\roms\*.ROM sao adicionados a mao (os dois
-         gitignored de proposito - fossauro.exe por ser binario grande,
-         dist\roms\ por serem ROMs com copyright proprio - mas pedido explicito
-         do usuario 2026-08-25: os dois fazem parte do pacote redistribuivel
-         mesmo assim, so' nao ficam rastreados no repositorio git).
       3. Compila src\installer\tools\BuildPayloadZip.pb (ferramenta de build,
          usa o Packer nativo do PureBasic - UseZipPacker/AddPackFile - em vez
          de Compress-Archive do PowerShell, mesmo espirito "sem dependencia
@@ -54,7 +49,7 @@ $RepoRoot = $PSScriptRoot
 
 # --- 1. Garante dist\ fresco --------------------------------------------
 if (-not $SkipAppBuild) {
-    Write-Host "=== Passo 1/4: compilando PaleoBasic + fossauro (build.ps1) ==="
+    Write-Host "=== Passo 1/4: compilando PaleoBasic (build.ps1) ==="
     & (Join-Path $RepoRoot "build.ps1") -V $Version
     if ($LASTEXITCODE -ne 0) {
         Write-Error "build.ps1 falhou (codigo $LASTEXITCODE)."
@@ -117,20 +112,7 @@ try {
     [Console]::OutputEncoding = $PrevOutputEncoding
 }
 
-
-# dist\roms\ e' gitignored de proposito (ROMs do sistema MSX pro Fossauro,
-# copyright proprio - nunca rastreadas no git, ver .gitignore/CLAUDE.md), logo
-# "git ls-files dist/" nunca as lista sozinho. Pedido explicito do usuario
-# (2026-08-25): o instalador standalone TAMBEM deve empacotar as ROMs (nao so'
-# o build local em dist\roms\) - adicionadas a mao aqui, mesmo espirito do
-# "dist/fossauro.exe" logo abaixo (tambem gitignored, tambem parte do pacote).
-$RomFiles = @()
-$DistRomsDir = Join-Path $RepoRoot "dist\roms"
-if (Test-Path $DistRomsDir) {
-    $RomFiles = Get-ChildItem -Path $DistRomsDir -File | ForEach-Object { "dist/roms/$($_.Name)" }
-}
-
-$allFiles = @($trackedFiles) + @("dist/fossauro.exe") + $RomFiles
+$allFiles = @($trackedFiles)
 # UTF8 sem BOM - o manifesto e' lido por um programa PureBasic (ReadFile/
 # ReadString), BOM na primeira linha corromperia o primeiro caminho.
 [System.IO.File]::WriteAllLines($ManifestPath, $allFiles, (New-Object System.Text.UTF8Encoding($false)))

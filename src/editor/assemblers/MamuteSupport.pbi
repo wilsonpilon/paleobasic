@@ -135,14 +135,12 @@ Procedure.i Mamute_CurrentBorderColor()
   ProcedureReturn Mamute_Msx1PaletteRGB(MamuteColorBorder)
 EndProcedure
 
-; Comandos FOSSAURO e OPENMSX (MamuteGui_CmdFossauro()/MamuteGui_CmdOpenMSX(),
-; MamuteAssemblerGui.pbi) - depois do LOAD, sempre digita "DEFUSR0=&H<endereco>" na sessao MSX
-; (ver Fossauro_SendAndType()/FossauroSupport.pbi ou OMSX_SendMamuteProgram()/
-; OpenMSXBridge.pbi, docs/SPEC.md modulos 32y/32z/33); se esta flag estiver ligada, digita
+; Comando OPENMSX (MamuteGui_CmdOpenMSX(), MamuteAssemblerGui.pbi) - depois do LOAD, sempre
+; digita "DEFUSR0=&H<endereco>" na sessao MSX (ver OMSX_SendMamuteProgram()/OpenMSXBridge.pbi,
+; docs/SPEC.md modulos 32z/33); se esta flag estiver ligada, digita
 ; ":A=USR0(0)" junto na MESMA linha, executando na hora que o Enter e' "digitado" - continua
 ; passando pelo interpretador BASIC de verdade (nao e' RUN cru nem debug set pc), so' automatiza
-; o "digitar A=USR0(0) e apertar Enter" manual. MESMA flag pros dois comandos (e' a mesma
-; decisao "executar ou nao" pro usuario, independente do alvo). Desligada por padrao de
+; o "digitar A=USR0(0) e apertar Enter" manual. Desligada por padrao de
 ; proposito - pedido explicito do usuario (2026-08-19): o comportamento padrao continua so'
 ; transferir, executar e' opt-in.
 Global MamuteAutoRunAfterTransfer.b = #False
@@ -2290,11 +2288,10 @@ Procedure MamuteSettings_OpenWindow(ParentWindow)
   EndSelect
   KeysY + 34
 
-  ; Comandos FOSSAURO/OPENMSX (MamuteAssemblerGui.pbi/FossauroSupport.pbi/OpenMSXBridge.pbi) -
-  ; ver comentario do Global MamuteAutoRunAfterTransfer acima. Mesma flag pros dois alvos
-  ; (e' a mesma decisao "executar ou nao" pro usuario). Desligado por padrao.
+  ; Comando OPENMSX (MamuteAssemblerGui.pbi/OpenMSXBridge.pbi) - ver comentario do Global
+  ; MamuteAutoRunAfterTransfer acima. Desligado por padrao.
   Protected G_AutoRunAfterTransfer = CheckBoxGadget(#PB_Any, 24, KeysY + 3, WinW - 48, 22,
-                                               "Executar automaticamente apos transferir - Fossauro/openMSX (A=USR0(0))")
+                                               "Executar automaticamente apos transferir - openMSX (A=USR0(0))")
   SetGadgetState(G_AutoRunAfterTransfer, MamuteAutoRunAfterTransfer)
   KeysY + 34
 
@@ -2532,10 +2529,10 @@ Global MamuteAsmLastByteCount.i
 ; Mamute_WriteByte - ver o "If AsmHasO" em MamuteEditGui.pbi). Zerado no
 ; INICIO de toda tentativa de montagem (Mamute_AsmAssemble abaixo, antes de
 ; saber se "O" foi pedido desta vez) e setado #True so' pelo chamador, apos
-; escrever os bytes com sucesso - existe pro comando FOSSAURO
-; (MamuteGui_CmdFossauro(), MamuteAssemblerGui.pbi) conseguir recusar enviar
+; escrever os bytes com sucesso - existe pro comando OPENMSX
+; (MamuteGui_CmdOpenMSX(), MamuteAssemblerGui.pbi) conseguir recusar enviar
 ; um intervalo de enderecos que na verdade nunca foi escrito na RAM simulada
-; (ex.: usuario rodou so' "A", sem "O", e tentou "FOSSAURO" na sequencia).
+; (ex.: usuario rodou so' "A", sem "O", e tentou "OPENMSX" na sequencia).
 Global MamuteAsmLastWroteToRam.b = #False
 
 ; Listagem formatada (linhas de texto ja' prontas pra desenhar) da ULTIMA

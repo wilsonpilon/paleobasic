@@ -1380,76 +1380,22 @@ Procedure MamuteGui_CmdR(G_Log, *State.MamuteGui_State, Args.s)
     "R - CARREGAMENTO DE PROGRAMA ASSEMBLADO AINDA NAO IMPLEMENTADO, FICA PRA UMA FASE FUTURA")
 EndProcedure
 
-; FOSSAURO - comando NOVO, fora do vocabulario do MegaAssembler original de
-; proposito (nao existe um "envie pra outro emulador rodando de verdade" no
-; manual de 1986) - pedido explicito do usuario, primeira ponta-a-ponta do
-; protocolo de controle remoto (ver docs/SPEC.md modulo 32u). Reenvia o
-; MESMO intervalo [MamuteAsmLastStartAddr, MamuteAsmLastByteCount) que "A O"
-; (tela EDIT) acabou de gravar em MamuteMem, lido de volta byte a byte via
-; Mamute_ReadByte() (respeita o mapeamento PAGE ativo, igual DM/qualquer
-; outro comando de memoria) - depois digita "DEFUSR0=&H<endereco>" na
-; janela do Fossauro (ver Fossauro_SendAndType(), FossauroSupport.pbi).
-; NAO executa mais o codigo sozinho por padrao (nao manda mais RUN cru):
-; pedido explicito do usuario (2026-08-19, modulo 32y) - tecnicamente so'
-; precisa transferir pra RAM, nao rodar; RUN cru sequestrava PC/SP de uma
-; sessao MSX ja viva (modulo 32x), enquanto DEFUSR digitado deixa a
-; BIOS/BASIC tratar a chamada com o contexto consistente dela. Se
-; MamuteAutoRunAfterTransfer estiver ligado (Configurar -> Mamute Assembler...,
-; MamuteSupport.pbi, default desligado), digita ":A=USR0(0)" na mesma linha
-; do DEFUSR0, executando na hora - senao fica so' o DEFUSR0, pronto pro
-; usuario digitar "A=USR0(0)" manualmente na janela do Fossauro quando
-; quiser. Exige MamuteAsmLastWroteToRam (so' fica #True depois
-; de um "A ...O..." bem-sucedido - "A" sozinho, sem "O", NAO escreve nada em
-; MamuteMem, entao enviar seria so' lixo/zeros).
-Procedure MamuteGui_CmdFossauro(G_Log, *State.MamuteGui_State)
-  If Not MamuteAsmHasResult Or Not MamuteAsmLastWroteToRam
-    *State\LogAccum = MamuteGui_AppendLog(G_Log, *State\LogAccum,
-      "?NADA MONTADO COM 'O' AINDA (monte com 'A O' na tela EDIT antes de FOSSAURO)")
-    ProcedureReturn
-  EndIf
-  If MamuteAsmLastByteCount <= 0
-    *State\LogAccum = MamuteGui_AppendLog(G_Log, *State\LogAccum, "?NADA GERADO (0 BYTES)")
-    ProcedureReturn
-  EndIf
-
-  *State\LogAccum = MamuteGui_AppendLog(G_Log, *State\LogAccum,
-    "FOSSAURO: ENVIANDO " + Str(MamuteAsmLastByteCount) + " BYTES PARA " + Mamute_Hex4(MamuteAsmLastStartAddr) + "H...")
-
-  Protected *Payload = AllocateMemory(MamuteAsmLastByteCount)
-  Protected I.i
-  For I = 0 To MamuteAsmLastByteCount - 1
-    PokeA(*Payload + I, Mamute_ReadByte((MamuteAsmLastStartAddr + I) & $FFFF))
-  Next I
-
-  Protected ErrMsg.s = Fossauro_SendAndType(MamuteAsmLastStartAddr, *Payload, MamuteAsmLastByteCount, MamuteAutoRunAfterTransfer)
-  FreeMemory(*Payload)
-
-  If ErrMsg = ""
-    *State\LogAccum = MamuteGui_AppendLog(G_Log, *State\LogAccum,
-      "OK - CARREGADO NO FOSSAURO EM " + Mamute_Hex4(MamuteAsmLastStartAddr) + "H, DEFUSR0 JA DIGITADO")
-    If MamuteAutoRunAfterTransfer
-      *State\LogAccum = MamuteGui_AppendLog(G_Log, *State\LogAccum, "EXECUTADO (A=USR0(0))")
-    Else
-      *State\LogAccum = MamuteGui_AppendLog(G_Log, *State\LogAccum,
-        "DIGITE A=USR0(0) NA JANELA DO FOSSAURO PRA RODAR")
-    EndIf
-  Else
-    *State\LogAccum = MamuteGui_AppendLog(G_Log, *State\LogAccum, "?" + UCase(ErrMsg))
-  EndIf
-EndProcedure
-
-; OPENMSX - mesma ideia do FOSSAURO logo acima, mirando a instancia de openMSX de verdade em
-; vez do Fossauro (pedido explicito do usuario, 2026-08-19: "mesmo processo, mas voltando do
-; compilador a pessoa usa openMSX" - reaproveita o bridge Tcl/XML ja existente,
-; OpenMSXBridge.pbi modulo 12, em vez de reinventar). Mesmo intervalo
-; [MamuteAsmLastStartAddr, MamuteAsmLastByteCount) lido via Mamute_ReadByte(), mas gravado byte
-; a byte na RAM real via "debug write memory" (comando nativo do openMSX,
-; OMSX_FlushMamuteProgram()) em vez de um protocolo proprio - depois digita "DEFUSR0=&H<endereco>"
-; (+ ":A=USR0(0)" se MamuteAutoRunAfterTransfer, MESMA flag que o FOSSAURO usa - e' a mesma
-; decisao "executar ou nao" pro usuario, independente de qual dos dois emuladores) via
-; OMSX_TypeText() - "type" nativo do openMSX, digita no teclado emulado de verdade. Sobe o
-; openMSX sozinho se precisar (OMSX_SendMamuteProgram() -> OMSX_Start(), mesmo botao "Executar
-; -> Abrir o openMSX..." usa). Mesma exigencia de MamuteAsmLastWroteToRam do FOSSAURO.
+; OPENMSX - mirando a instancia de openMSX de verdade (pedido explicito do usuario, 2026-08-19:
+; "mesmo processo, mas voltando do compilador a pessoa usa openMSX" - reaproveita o bridge Tcl/XML
+; ja existente, OpenMSXBridge.pbi modulo 12, em vez de reinventar). Reenvia o MESMO intervalo
+; [MamuteAsmLastStartAddr, MamuteAsmLastByteCount) que "A O" (tela EDIT) acabou de gravar em
+; MamuteMem, lido de volta byte a byte via Mamute_ReadByte() (respeita o mapeamento PAGE ativo,
+; igual DM/qualquer outro comando de memoria), gravado byte a byte na RAM real via "debug write
+; memory" (comando nativo do openMSX, OMSX_FlushMamuteProgram()) - depois digita
+; "DEFUSR0=&H<endereco>" na sessao MSX. NAO executa mais o codigo sozinho por padrao (nao manda
+; mais RUN cru): pedido explicito do usuario (2026-08-19, modulo 32y) - tecnicamente so' precisa
+; transferir pra RAM, nao rodar; RUN cru sequestrava PC/SP de uma sessao MSX ja viva (modulo 32x),
+; enquanto DEFUSR digitado deixa a BIOS/BASIC tratar a chamada com o contexto consistente dela. Se
+; MamuteAutoRunAfterTransfer estiver ligado (Configurar -> Mamute Assembler..., MamuteSupport.pbi,
+; default desligado), digita ":A=USR0(0)" na mesma linha do DEFUSR0, executando na hora - senao
+; fica so' o DEFUSR0, pronto pro usuario digitar "A=USR0(0)" manualmente quando quiser. Exige
+; MamuteAsmLastWroteToRam (so' fica #True depois de um "A ...O..." bem-sucedido - "A" sozinho,
+; sem "O", NAO escreve nada em MamuteMem, entao enviar seria so' lixo/zeros).
 Procedure MamuteGui_CmdOpenMSX(G_Log, *State.MamuteGui_State)
   If Not MamuteAsmHasResult Or Not MamuteAsmLastWroteToRam
     *State\LogAccum = MamuteGui_AppendLog(G_Log, *State\LogAccum,
@@ -4909,9 +4855,6 @@ Procedure MamuteGui_Dispatch(Win, G_Log, *State.MamuteGui_State, Cmd.s)
 
     Case "R"
       MamuteGui_CmdR(G_Log, *State, Args)
-
-    Case "FOSSAURO"
-      MamuteGui_CmdFossauro(G_Log, *State)
 
     Case "OPENMSX"
       MamuteGui_CmdOpenMSX(G_Log, *State)

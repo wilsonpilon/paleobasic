@@ -43,7 +43,6 @@ o time se refere a cada módulo em conversa e nos comentários de cabeçalho:
 | 🦕 **Diplodoco** | `src/editor/core/MSXDisk.pbi` + `src/editor/core/DiskManagerGui.pbi` — imagens `.dsk` |
 | 🎨 **Pixelossauro** | `src/editor/visual_editors/Screen0EditorGui.pbi`, `Screen1EditorGui.pbi`, `Screen2EditorGui.pbi`, `Screen12EditorGui.pbi` — editores de tela pixel-a-pixel |
 | 🦅 **Pteranodonte** | `src/editor/emulators/OpenMSXBridge.pbi` — ponte/lançamento do openMSX |
-| 🦴 **Fossauro** | `src/fossauro/` — port nativo em PureBasic do fMSX (emulador MSX completo: Z80, memória/slots, PPI, VDP V9938, PSG), projeto irmão dentro do repositório principal |
 
 ## O que já temos
 
@@ -631,22 +630,10 @@ Mamute Assembler...** sempre reflete só o que já foi portado; lista completa d
 
 Detalhes em `docs/SPEC.md`, módulo 31.
 
-**🦴 Fossauro — emulador MSX nativo (`src/fossauro/`)** — ⚠️ ainda em fase inicial, não é uso
-despreocupado ainda — port em PureBasic do **fMSX** de Marat Fayzullin, projeto irmão dentro deste
-mesmo repositório (não incorporado à IDE — licença própria não-comercial, incompatível com a GPL v3
-deste projeto, ver [Licença](#licença) abaixo — sempre chamado como executável externo). Já **boota
-MSX1/MSX2/MSX2+ de ponta a ponta** até o prompt do BASIC, com áudio do PSG (AY-3-8910) e vídeo SCREEN
-0/1/2/6/7 funcionando. Integrado à IDE de duas formas: **`Executar → Fossauro`** (F10) abre o
-emulador configurado, e o comando **`FOSSAURO`** do Mamute Assembler transfere um programa Z80 recém
-montado direto pra RAM dele e digita `DEFUSR0=&Hxxxx` na sessão — sem passar por disco, sem hijack de
-`PC`/pilha (mesmo protocolo de controle remoto próprio, via named pipe, que o comando `OPENMSX`
-reaproveita pra mirar um openMSX de verdade em vez do Fossauro). Limitações conhecidas e documentadas:
-escala de vídeo maior que 1:1 trava a janela (causa raiz não isolada, ver `docs/SPEC.md` módulo 32s) e
-o driver de disquete (FDC) tem uma regressão de boot ainda aberta.
-
-![Fossauro rodando MSX BASIC (Executar → Fossauro)](docs/images/msxbasica-22.png)
-
-Detalhes em `docs/SPEC.md`, módulos 32b-36.
+> O projeto teve, por um tempo, um emulador MSX nativo próprio (**Fossauro**, port em PureBasic do
+> fMSX de Marat Fayzullin) — removido do repositório em 2026-09-13. Deve ser substituído no futuro
+> por um projeto separado, [**gofMSX**](https://github.com/wilsonpilon/gofMSX), ainda não integrado
+> a este IDE.
 
 ## Changelog
 
@@ -701,15 +688,4 @@ Este projeto não existiria sem o trabalho de:
 
 ## Licença
 
-Este repositório tem **duas licenças separadas**, uma por sub-projeto — não misture os dois ao
-redistribuir:
-
-| Sub-projeto | Licença | Arquivo | Por quê |
-|---|---|---|---|
-| **Paleobasic** (`src/editor/`, o IDE em si) | [GNU GPL v3](LICENSE) | [`LICENSE`](LICENSE) | Licença própria do projeto, copyleft. |
-| **🦴 Fossauro** (`src/fossauro/`, port do fMSX) | Não-comercial (derivada da licença original do fMSX) | [`LICENSE-fossauro`](LICENSE-fossauro) (cópia também em [`src/fossauro/LICENSE`](src/fossauro/LICENSE)) | `src/fossauro/` é um port do código de Marat Fayzullin — herda a cláusula não-comercial do fMSX original, incompatível com GPL v3. Uso, cópia e modificação são livres para fins não-comerciais/educacionais; uso comercial exige permissão do autor original. |
-
-As duas licenças convivem porque, hoje, os dois sub-projetos rodam como **processos separados** (o
-IDE não faz link direto com o código do Fossauro) — ver `docs/SPEC.md`, módulo 32b, para a pendência
-em aberto sobre o que acontece se uma integração mais profunda (in-process) vier a ser decidida no
-futuro.
+Paleobasic (`src/editor/`, o IDE em si) é licenciado sob [GNU GPL v3](LICENSE) — ver [`LICENSE`](LICENSE).

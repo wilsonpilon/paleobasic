@@ -3,9 +3,8 @@
 ;  BuildPayloadZip.exe - ferramenta de build (NAO faz parte do produto final).
 ;  Empacota o conteudo de dist\ (a lista exata de arquivos vem de um manifesto
 ;  de texto, uma linha por arquivo, caminho relativo a raiz do projeto - ver
-;  build-installer.ps1, que gera esse manifesto via "git ls-files dist/" +
-;  extras nao rastreados mas necessarios como dist/fossauro.exe) num unico
-;  .zip que o instalador (PaleoBasicSetup.pb) embute via IncludeBinary.
+;  build-installer.ps1, que gera esse manifesto via "git ls-files dist/") num
+;  unico .zip que o instalador (PaleoBasicSetup.pb) embute via IncludeBinary.
 ;
 ;  Usa o Packer nativo do PureBasic (UseZipPacker/CreatePack/AddPackFile), nao
 ;  Compress-Archive do PowerShell nem nenhuma lib externa - mesmo espirito

@@ -17,18 +17,12 @@
     data/hora UTC do momento da compilacao, convertida para hexadecimal
     (segundos desde a epoch Unix).
 
-    Todo build compila os DOIS executaveis (dist\PaleoBasic.exe e
-    dist\fossauro.exe, via src\fossauro\build.ps1) e atualiza dist\ por
-    inteiro (recursos de resource\, docs, ROMs) - pedido explicito do usuario
-    (2026-08-20): fossauro e parte do PaleoBasic, um build unico tem que
-    deixar o pacote pronto, sem precisar rodar dois scripts nem lembrar de um
-    flag extra (a antiga opcao -D/--distribute foi removida - o que ela fazia
-    agora sempre acontece).
+    Todo build compila dist\PaleoBasic.exe e atualiza dist\ por inteiro
+    (recursos de resource\, docs) - a antiga opcao -D/--distribute foi
+    removida em 2026-08-20 - o que ela fazia agora sempre acontece.
 
-    Desde 2026-08-25 (pedido explicito do usuario), todo build TAMBEM: copia
-    as ROMs de resource\roms\ pra dist\roms\ (ja fazia isso, mas so' se
-    resource\roms\ existisse - continua condicional a isso, nunca falha o
-    build por ROM ausente), gera um .zip novo do pacote dist\ inteiro
+    Desde 2026-08-25 (pedido explicito do usuario), todo build TAMBEM: gera um
+    .zip novo do pacote dist\ inteiro
     (paleobasic-v<versao>.zip na raiz do repo, mesma convencao ja usada nos
     releases manuais anteriores - ver .gitignore) e chama build-installer.ps1
     (com -SkipAppBuild, pra nao recompilar tudo de novo) pra deixar
@@ -62,9 +56,8 @@ function Show-Help {
     @"
 Uso: build.ps1 [opcoes]
 
-Compila o MSX BASIC+Z80 IDE (dist\PaleoBasic.exe) e o fossauro
-(dist\fossauro.exe, via src\fossauro\build.ps1), depois atualiza dist\ por
-inteiro (recursos de resource\, docs, ROMs) - sempre, todo build deixa o
+Compila o MSX BASIC+Z80 IDE (dist\PaleoBasic.exe), depois atualiza dist\ por
+inteiro (recursos de resource\, docs) - sempre, todo build deixa o
 pacote pronto. Em seguida gera paleobasic-v<versao>.zip (pacote dist\
 inteiro) e installer\PaleoBasicSetup.exe (via build-installer.ps1).
 
@@ -73,7 +66,7 @@ Opcoes:
                              build.config.json para as proximas execucoes.
   -R, --run                 Executa o programa apos compilar com sucesso.
   -H, --help                Mostra esta ajuda e sai.
-  -V, --version <versao>    Versao embutida nos dois executaveis (padrao: 8.6.0).
+  -V, --version <versao>    Versao embutida no executavel (padrao: 8.6.0).
   -i, --sourcefile <arquivo> Arquivo fonte a compilar
                              (padrao: src\editor\BadigEditor.pb).
   -o, --outputexe <arquivo> Caminho do executavel de saida
@@ -238,20 +231,6 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "Build concluido: $OutputExe"
 
-# fossauro e parte do PaleoBasic (nao um projeto separado) - todo build deste
-# script tambem builda o fossauro, mesma versao, licenca propria/nao-comercial
-# (LICENSE-fossauro) a parte so muda ONDE o codigo mora, nao SE ele e buildado
-# junto. Script proprio porque compila um .pb diferente (src\fossauro\fossauro.pb),
-# mas roda sempre daqui em diante - pedido explicito do usuario (2026-08-20).
-Write-Host ""
-Write-Host "Compilando fossauro..."
-$FossauroBuildScript = Join-Path $PSScriptRoot "src\fossauro\build.ps1"
-& $FossauroBuildScript -Version $Version
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Falha na compilacao do fossauro (codigo $LASTEXITCODE)."
-    exit $LASTEXITCODE
-}
-
 Write-Host ""
 Write-Host "Atualizando dist\..."
 
@@ -294,24 +273,6 @@ $DistToolsDir = Join-Path $DistEditorDir "tools"
 New-Item -ItemType Directory -Path $DistToolsDir -Force | Out-Null
 Copy-DistItem -Path (Join-Path $PSScriptRoot "resource\tools\msxbas2rom") -Destination (Join-Path $DistToolsDir "msxbas2rom") -Recurse
 Copy-DistItem -Path (Join-Path $PSScriptRoot "resource\tools\n80") -Destination (Join-Path $DistToolsDir "n80") -Recurse
-
-# help do Fossauro (o executavel em si ja foi compilado acima, direto pra
-# dist\fossauro.exe por src\fossauro\build.ps1).
-$DistFossauroDir = Join-Path $DistDir "fossauro"
-New-Item -ItemType Directory -Path $DistFossauroDir -Force | Out-Null
-Copy-DistItem -Path (Join-Path $PSScriptRoot "resource\fossauro_help") -Destination (Join-Path $DistFossauroDir "help") -Recurse
-
-# ROMs do sistema MSX pro Fossauro (MSX.pbi le "roms/MSX.ROM" e afins, caminho
-# cru relativo ao diretorio de trabalho no lancamento - dist\fossauro.exe roda
-# com CWD = dist\, entao a pasta precisa se chamar dist\roms\, nao
-# dist\fossauro\roms\). Fonte canonica fica em resource\roms\ - copyright
-# proprio, nunca rastreado no git (ver .gitignore); so' copia se o usuario ja
-# tiver colocado as ROMs la.
-if (Test-Path (Join-Path $PSScriptRoot "resource\roms")) {
-    $DistRomsDir = Join-Path $DistDir "roms"
-    New-Item -ItemType Directory -Path $DistRomsDir -Force | Out-Null
-    Copy-DistItem -Path (Join-Path $PSScriptRoot "resource\roms\*.ROM") -Destination $DistRomsDir
-}
 
 Write-Host "dist\ atualizado em: $DistDir"
 

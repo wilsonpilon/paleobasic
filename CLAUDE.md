@@ -23,6 +23,16 @@ proposing structural changes. `README.md` has a quick "what already exists" summ
 session-by-session changelog lives in `CHANGELOG.md` (split out 2026-08-19, README had grown past 3000
 lines). `docs/MANUAL.md` is the end-user guide (editor keybindings, disk manager, config screens).
 
+**Fossauro removed from the project (2026-09-13)** — the from-scratch PureBasic port of fMSX (its own
+bundled MSX emulator, `src/fossauro/`) was removed entirely at the user's explicit request: the source
+directory, `dist/fossauro.exe`/`dist/fossauro/`, `resource/fossauro_help/`, `docs/fossauro/`,
+`LICENSE-fossauro`, the Mamute Assembler monitor's `FOSSAURO` command, and every menu item/build step
+that referenced it are all gone. It is meant to be replaced eventually by a separate project
+(**gofMSX**, https://github.com/wilsonpilon/gofMSX) — not now, and not yet integrated here; nothing in
+this codebase calls out to it. If a future session needs the removed fMSX-port's history/rationale,
+it's in git history from before this removal (see `CHANGELOG.md`) and `docs/SPEC.md`'s module list
+still names the modules that used to cover it, marked removed.
+
 ## Commands
 
 Primary development is on **Windows via PowerShell**; a **Linux build script (`build.sh`)** also exists,
@@ -171,14 +181,12 @@ link with "undefined symbol" specifically on an x86 build, this exact decoration
 to check** — see `docs/SPEC.md` module 32q for the full investigation.
 
 ```powershell
-# Compiles BOTH executables every time (dist\PaleoBasic.exe from
-# src\editor\BadigEditor.pb, and dist\fossauro.exe via src\fossauro\build.ps1 -
-# fossauro is part of the project, not a side build, see 2026-08-20 entry
-# below) and refreshes the rest of dist\ from resource\ (fonts/help images/
-# tools/ROMs) unconditionally - there used to be a separate -D/--distribute
-# flag gating that step; removed 2026-08-20, a single build now always
-# produces the full package. Finds pbcompiler.exe automatically, or pass -C
-# once and it's remembered in build.config.json, gitignored/machine-local.
+# Compiles dist\PaleoBasic.exe from src\editor\BadigEditor.pb and refreshes
+# the rest of dist\ from resource\ (fonts/help images/tools) unconditionally -
+# there used to be a separate -D/--distribute flag gating that step; removed
+# 2026-08-20, a single build now always produces the full package. Finds
+# pbcompiler.exe automatically, or pass -C once and it's remembered in
+# build.config.json, gitignored/machine-local.
 .\build.ps1
 .\build.ps1 -C "C:\Basic\Compilers\pbcompiler.exe"   # first time on a new machine
 .\build.ps1 -R                                        # build then run
@@ -236,27 +244,23 @@ dist\PaleoBasic.exe --diskmanipulator create|list|add|extract|delete disco.dsk .
 ## Architecture
 
 **Top-level directory layout** (reorganized 2026-08-19, see `docs/SPEC.md` modules 35/36 for the full
-rationale/mapping): `src/` (all compiled source — `src/editor/`, `src/fossauro/`), `dist/` (everything
-the built app needs to run — `dist/PaleoBasic.exe` and `dist/fossauro.exe` both live at the *root* of
-`dist/`, each looking up its own help/config/resources in the matching subfolder, `dist/editor/`/
-`dist/fossauro/`; `dist/res/`, `dist/sample/`, `dist/projects/`, `dist/roms/` (Fossauro's system ROMs,
-copyright — never tracked) sit alongside — versioned alongside the generated pieces `build.ps1`
-refreshes, see Commands above), `resource/` (vendored/non-compiled assets the project owns — bundled
-fonts, help-viewer images, external tool bundles, reference-only vendored trees like
-`resource/openmsx/`, `resource/nestor/`, `resource/roms/` (canonical source for Fossauro's ROMs, also
-never tracked)), `docs/` (all documentation, including `docs/fossauro/`), `others/` (zero-reference
-directories kept only as deletion candidates, not part of the live project). Moving a file: compiled
-source goes in `src/`, anything the running `.exe` reads goes in (or gets copied by `build.ps1` into)
-`dist/`, everything else non-compiled that the project still owns goes in `resource/`. **Every runtime
-path is computed relative to `GetPathPart(ProgramFilename())`** (the exe's own directory) — since both
-exes sit at `dist/`'s root, editor-specific resources are looked up via an explicit `"editor\"` prefix
-and fossauro-specific ones via `"fossauro\"` (see `FossauroDir()`, `FossauroSupport.pbi`), not a bare
-filename or a `"..\"` climb like before this second layout pass.
+rationale/mapping): `src/` (all compiled source — `src/editor/`), `dist/` (everything the built app
+needs to run — `dist/PaleoBasic.exe` lives at the *root* of `dist/`, looking up its own help/config/
+resources in `dist/editor/`; `dist/res/`, `dist/sample/`, `dist/projects/` sit alongside — versioned
+alongside the generated pieces `build.ps1` refreshes, see Commands above), `resource/` (vendored/
+non-compiled assets the project owns — bundled fonts, help-viewer images, external tool bundles,
+reference-only vendored trees like `resource/openmsx/`, `resource/nestor/`), `docs/` (all
+documentation), `others/` (zero-reference directories kept only as deletion candidates, not part of
+the live project). Moving a file: compiled source goes in `src/`, anything the running `.exe` reads
+goes in (or gets copied by `build.ps1` into) `dist/`, everything else non-compiled that the project
+still owns goes in `resource/`. **Every runtime path is computed relative to
+`GetPathPart(ProgramFilename())`** (the exe's own directory) — editor-specific resources are looked up
+via an explicit `"editor\"` prefix, not a bare filename or a `"..\"` climb like before the second layout
+pass.
 
 **Single compilation unit.** `src/editor/BadigEditor.pb` is the only file passed to `pbcompiler.exe`;
 every `.pbi` file is pulled in via `XIncludeFile` (textual inclusion, not a real module boundary) and
-compiles into one `.exe` (`dist/PaleoBasic.exe` — the two exes now live at the root of `dist/`, each
-looking up its own help/config in the matching subfolder, `dist/editor/`/`dist/fossauro/`).
+compiles into one `.exe` (`dist/PaleoBasic.exe`, looking up its own help/config in `dist/editor/`).
 `MSXDisk.pbi` is the one file using a real
 `DeclareModule`/`Module` (`MSXDisk::`), so its calls are qualified. **`XIncludeFile` paths resolve
 relative to the file containing the directive, not relative to the root `.pb`** (confirmed empirically
@@ -281,8 +285,8 @@ not the logic that depends on it.
 
 `src/editor/` is split into subfolders by logical function — `core/` (preprocessor/tokenizer/disk/
 project/settings foundation), `assemblers/` (Mamute, Z80Asm engine, N80/Asmsx wrappers, linker),
-`basic/` (Nestor Basic, MsxBas2Rom, BASIC-specific options), `emulators/` (openMSX bridge, Fossauro
-bridge), `visual_editors/` (sprite/screen/charset/sound editors), `help/` (standalone reference-book
+`basic/` (Nestor Basic, MsxBas2Rom, BASIC-specific options), `emulators/` (openMSX bridge),
+`visual_editors/` (sprite/screen/charset/sound editors), `help/` (standalone reference-book
 viewers — Red Book, BIOS calls, hardware, MSX manuals; feature-specific help like Mamute's or
 NestorBasic's own stays alongside that feature's files instead), plus `tools/` (the console test
 harnesses). A handful of representative files:
@@ -301,7 +305,6 @@ src/editor/core/ThemedButtons.pbi            Macro ThemedButton()/#Icon_* - ever
 src/editor/core/FontDownloader.pbi           Nerd Fonts download picker
 src/editor/assemblers/MamuteAssemblerGui.pbi "Executar -> Mamute Assembler..." monitor, see module 31
 src/editor/emulators/OpenMSXBridge.pbi       real openMSX remote-control bridge (Tcl/XML), see module 12
-src/editor/emulators/FossauroSupport.pbi     Fossauro (own emulator) launch + named-pipe client
 src/editor/tools/*Cli.pb                     standalone console test harnesses, see Commands above
 ```
 

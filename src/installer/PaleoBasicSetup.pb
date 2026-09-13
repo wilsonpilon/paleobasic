@@ -16,10 +16,10 @@
 ;      de Program Files; ver decisao do usuario abaixo).
 ;   2. Detecta se ja existe uma instalacao ali (PaleoBasic.exe presente) -
 ;      se sim, a tela vira "Atualizar" em vez de "Instalar".
-;   3. Extrai o payload (dist\ inteiro, exceto configuracoes/ROMs/projetos
+;   3. Extrai o payload (dist\ inteiro, exceto configuracoes/projetos
 ;      pessoais - ver BuildPayloadZip.pb/build-installer.ps1) embutido neste
 ;      .exe via IncludeBinary, pulando qualquer arquivo de configuracao
-;      (editor/*.json, fossauro/*.json) que JA EXISTA no destino - e assim
+;      (editor/*.json) que JA EXISTA no destino - e assim
 ;      que "atualizar preserva configuracao" e satisfeito, sem logica
 ;      separada de "modo update": a mesma regra vale nos dois casos, so que
 ;      numa instalacao nova nao ha nada pra preservar ainda.
@@ -229,7 +229,7 @@ EndProcedure
 ; sem precisar de um modo "update" separado (ver cabecalho do arquivo).
 Procedure.b IsPreserveOnUpdatePath(ArchiveName.s)
   Protected N.s = LCase(ArchiveName)
-  If (Left(N, 7) = "editor/" Or Left(N, 9) = "fossauro/") And Right(N, 5) = ".json"
+  If Left(N, 7) = "editor/" And Right(N, 5) = ".json"
     ProcedureReturn #True
   EndIf
   ProcedureReturn #False

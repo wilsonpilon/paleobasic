@@ -502,10 +502,9 @@ EndProcedure
 ; "memory" = espaco de enderecamento de 64KB que o CPU enxerga, confirmado lendo
 ; openmsx/openmsx/src/cpu/MSXCPUInterface.cc/src/debugger/Debugger.cc, "checkNumArgs(tokens,
 ; 5, ..., "debuggable address value")" - um byte por comando, sem bloco). Depois digita
-; "DEFUSR0=&H<Addr>" (+ ":A=USR0(0)" se AutoRun) via OMSX_TypeText() - mesma logica do
-; Fossauro_SendAndType() (FossauroSupport.pbi, docs/SPEC.md modulos 32y/32z): nao existe RUN
-; cru aqui, o texto entra pelo teclado emulado de verdade e o BASIC processa com o proprio
-; contexto. Uso interno - chamado direto (ja conectado) ou via OMSX_PendingMamuteAddr
+; "DEFUSR0=&H<Addr>" (+ ":A=USR0(0)" se AutoRun) via OMSX_TypeText() (docs/SPEC.md modulo 32z):
+; nao existe RUN cru aqui, o texto entra pelo teclado emulado de verdade e o BASIC processa com o
+; proprio contexto. Uso interno - chamado direto (ja conectado) ou via OMSX_PendingMamuteAddr
 ; (OMSX_PipeConnectThread() acima) quando o openMSX ainda estava subindo.
 Procedure OMSX_FlushMamuteProgram(Addr.u, *Payload, ByteCount.i, AutoRun.b)
   Protected I.i
@@ -520,9 +519,8 @@ Procedure OMSX_FlushMamuteProgram(Addr.u, *Payload, ByteCount.i, AutoRun.b)
   OMSX_TypeText(DefUsrLine + Chr(13))
 EndProcedure
 
-; Comando OPENMSX do Mamute Assembler (MamuteGui_CmdOpenMSX(), MamuteAssemblerGui.pbi) -
-; equivalente ao FOSSAURO (Fossauro_SendAndType(), FossauroSupport.pbi), so' que mirando a
-; instancia de openMSX de verdade em vez do Fossauro. Sobe o openMSX se precisar (OMSX_Start(),
+; Comando OPENMSX do Mamute Assembler (MamuteGui_CmdOpenMSX(), MamuteAssemblerGui.pbi) - mira a
+; instancia de openMSX de verdade. Sobe o openMSX se precisar (OMSX_Start(),
 ; reaproveita se ja estiver rodando, mesmo padrao de OMSX_LoadDisk() logo abaixo) - se o pipe
 ; ainda nao tiver conectado, guarda uma COPIA dos bytes em OMSX_PendingMamuteBytes pra
 ; OMSX_PipeConnectThread() mandar assim que a conexao completar, em vez de perder o pedido
@@ -756,10 +754,10 @@ EndProcedure
 ; nao só uma leitura de codigo: a tabela real do openMSX
 ; (getMSXMapping()/KeyMatrixPosition, resource/openmsx/openmsx/src/input/
 ; Keyboard.cc - "// row/bit 7 6 5 4 3 2 1 0" comentado no proprio arquivo) e a
-; tabela KeyboardData ja portada do fMSX real pro proprio simulador MSX deste
-; projeto (src/fossauro/MSX.pbi, Data.b Row,Mask por tecla) - as duas batem
-; 100% em tudo que interessa aqui (linhas 6/7/8: modificadores, funcao,
-; controle, cursor). Achado um bug real nesse cruzamento: o comentario antigo
+; tabela KeyboardData ja portada do fMSX real pro simulador MSX proprio que o projeto tinha na
+; epoca (src/fossauro/MSX.pbi, Data.b Row,Mask por tecla - fossauro removido do projeto em
+; 2026-09-13, ver CLAUDE.md) - as duas batiam 100% em tudo que interessava aqui (linhas 6/7/8:
+; modificadores, funcao, controle, cursor). Achado um bug real nesse cruzamento: o comentario antigo
 ; desta mesma funcao (removido agora) afirmava STOP = linha 7 mascara 0x08,
 ; "confirmado" contra um binding real do openMSX que na verdade NAO EXISTE
 ; nos scripts vendorizados (share/scripts/*.tcl nao tem nenhum "bind PAGEUP
