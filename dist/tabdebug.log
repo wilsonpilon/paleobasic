@@ -85,3 +85,9 @@
 19:05:21.480  SetActiveTab(0)  DocsCount=1  ActiveBefore=-1
 19:05:21.482  RedrawTabBar  W=1000 H=36 StartDrawingOk=335614409 DocsCount=1 ActiveTabPosition=0
 19:05:21.483  RedrawTabBar  W=1000 H=36 StartDrawingOk=453054921 DocsCount=1 ActiveTabPosition=0
+07:08:36.611  AddDocumentTab entrada  Path=''  Mode=DMX  DocsCountAntes=0
+07:08:36.625  AddDocumentTab saida  NewPosition=0  Sci=1870923898496  DocsCountDepois=1
+07:08:36.626  RedrawTabBar  W=1000 H=36 StartDrawingOk=1258359436 DocsCount=1 ActiveTabPosition=-1
+07:08:36.627  SetActiveTab(0)  DocsCount=1  ActiveBefore=-1
+07:08:36.629  RedrawTabBar  W=1000 H=36 StartDrawingOk=402722951 DocsCount=1 ActiveTabPosition=0
+07:08:36.630  RedrawTabBar  W=1000 H=36 StartDrawingOk=503386247 DocsCount=1 ActiveTabPosition=0
